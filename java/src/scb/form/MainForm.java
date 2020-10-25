@@ -134,9 +134,10 @@ public class MainForm extends Base {
 		label.setHorizontalAlignment(JLabel.LEFT);
 		tempPanel2.add(label, BorderLayout.NORTH);
 		
-		boardPanel.setBackground(new Color(255, 0, 0, 0));
 		boardPanel.setBorder(new LineBorder(Color.black));
 		boardPane = new JScrollPane(boardPane);
+		boardPane.setOpaque(false);
+		boardPane.getViewport().setOpaque(false);
 		boardPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		boardPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		

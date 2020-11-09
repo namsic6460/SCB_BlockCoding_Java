@@ -207,8 +207,8 @@ public class MainForm extends Base {
 					return;
 				}
 				
-				new AttackCheckForm().setVisible(true);
 				Config.frames.get(0).setVisible(false);
+				new AttackCheckForm().setVisible(true);
 			}
 		};
 	}

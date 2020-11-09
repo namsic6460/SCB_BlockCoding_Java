@@ -107,6 +107,7 @@ public class StartForm extends Base {
 				
 				new MainForm().setVisible(true);
 				frame.dispose();
+				Config.frames.remove(0);
 			}
 		};
 	}

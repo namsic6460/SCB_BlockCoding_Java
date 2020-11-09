@@ -10,8 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -137,7 +135,14 @@ public class AttackCheckForm extends Base {
 					JOptionPane.showMessageDialog(Config.frames.get(1), "공격 타이밍이 비어있습니다", "경고!", JOptionPane.WARNING_MESSAGE);
 				
 				else {
-					makeStrategyFile();
+					JFrame frame = new GameForm();
+					frame.setVisible(true);
+					
+					for (int i = 0; i < 2; i++) {
+						frame = Config.frames.get(0);
+						frame.dispose();
+						Config.frames.remove(0);
+					}
 					
 					try {
 						Runtime.getRuntime().exec(Config.CHAOS_PATH);
@@ -145,21 +150,15 @@ public class AttackCheckForm extends Base {
 						throw new RuntimeException(e_);
 					}
 					
-					BotMain.main();
+					new Thread(new Runnable() {						
+						@Override
+						public void run() {
+							BotMain.main();
+						}
+					}).start();
 				}
 			}
 		};
-	}
-	
-	private void makeStrategyFile() {
-		Timer timer = new Timer();
-		TimerTask task = new TimerTask() {
-			@Override
-			public void run() {
-				Config.playSound("Terran Theme.wav");
-			}
-		};
-		timer.scheduleAtFixedRate(task, 0, 300000);
 	}
 
 	private ActionListener backBtnClicked() {

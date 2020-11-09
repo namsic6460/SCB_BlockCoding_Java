@@ -23,7 +23,7 @@ public class Main {
 		String command = cmd.inputCommand("set SCB_BlockCoding");
 		String result = cmd.execCommand(command);
 		
-		if(result.equals("")) {
+		if(result.equals("") || !new File(Config.IMAGE_PATH).exists()) {
 			String userName = System.getProperty("user.name");
 			
 			JFileChooser chooser = new JFileChooser(new File("C:/Users/" + userName + "/Desktop"));

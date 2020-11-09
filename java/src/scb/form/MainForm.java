@@ -3,6 +3,7 @@ package scb.form;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -17,11 +18,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
@@ -36,26 +40,25 @@ import scb.base.Config.UNIT_TYPE;
 public class MainForm extends Base {
 	
 	JPanel selectPanel = new JPanel(new FlowLayout());
-	JPanel boardPanel = new JPanel(new BorderLayout());
-	JScrollPane boardPane;
+	JPanel boardPanel = new JPanel(new GridLayout(2000, 1, 5, 10));
 	
 	Font verticalFont = new Font("Times New Roman", Font.BOLD, 18).deriveFont(AffineTransform.getRotateInstance((0.45 * Math.PI)));
 	TRIBE selectedTribe = Config.tribe;
 	UNIT_TYPE selectedUnitType = UNIT_TYPE.UNIT;
 	JButton selectedBtn;
+	JButton recentButton = null;
 	
 	LinkedHashMap<TRIBE, JButton> tribeBtns = new LinkedHashMap<>();
 	LinkedHashMap<UNIT_TYPE, JButton> typeBtns = new LinkedHashMap<>();
 	LinkedHashMap<TRIBE, LinkedHashMap<UNIT_TYPE, JScrollPane>> selectPanes = new LinkedHashMap<>();
 	LinkedHashMap<String, JButton> selectBtns = new LinkedHashMap<>();
 	
-	//20개마다 새로운 LinkedList생성 - 검색뿐만 아니라 추가/삭제도 빈번하기 떄문
-	ArrayList<LinkedList<JButton>> buildList = new ArrayList<>();
-	int list1Idx = 0;	//0~~
-	int list2Idx = 0;	//0~19
+	int buildIdx = -1;
+	int maxBuildIdx = -1;
+	LinkedHashMap<JButton, Integer> buildBtnIdx = new LinkedHashMap<>();
 	
 	public MainForm() {
-		super("스타크래프트 봇 프로그래밍", 960, 620, 0, 0);
+		super("스타크래프트 봇 프로그래밍", 960, 640, 0, 0);
 		
 		//West
 		JPanel wp = new JPanel(new BorderLayout());
@@ -106,12 +109,11 @@ public class MainForm extends Base {
 				}
 			};
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		cp.setPreferredSize(new Dimension(660, 580));
 		cp.setBackground(Color.lightGray);
 
-		buildList.add(new LinkedList<>());
 		initCenterPanel(cp);
 		
 		this.add(cp, BorderLayout.CENTER);
@@ -124,10 +126,10 @@ public class MainForm extends Base {
 		//North
 		JPanel tempPanel1 = new JPanel(new BorderLayout());
 		tempPanel1.setBorder(new EmptyBorder(5, 5, 5, 5));
-		tempPanel1.setBackground(new Color(255, 0, 0, 0));
+		tempPanel1.setOpaque(false);
 		
 		JPanel tempPanel2 = new JPanel(new BorderLayout());
-		tempPanel2.setBackground(new Color(255, 0, 0, 0));
+		tempPanel2.setOpaque(false);
 		
 		JLabel label = createLabel("Start!", JLabel.CENTER, new Font("Times New Roman", Font.BOLD, 25));
 		label.setBounds(10, 10, 100, 35);
@@ -135,13 +137,32 @@ public class MainForm extends Base {
 		tempPanel2.add(label, BorderLayout.NORTH);
 		
 		boardPanel.setBorder(new LineBorder(Color.black));
-		boardPane = new JScrollPane(boardPane);
+		boardPanel.setOpaque(false);
+		
+		JScrollPane boardPane = new JScrollPane(boardPanel);
 		boardPane.setOpaque(false);
 		boardPane.getViewport().setOpaque(false);
 		boardPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		boardPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		boardPane.getVerticalScrollBar().setUnitIncrement(16);
+		boardPane.setOpaque(false);
 		
 		tempPanel2.add(boardPane, BorderLayout.CENTER);
+		
+		JPanel rightPanel = new JPanel(new BorderLayout());
+		rightPanel.setOpaque(false);
+		
+		JButton button = createStarButton("<html>R<br>E<br>S<br>E<br>T</html>", resetBtnClicked(Config.frames.get(0)));
+		button.setFont(verticalFont);
+		button.setPreferredSize(new Dimension(75, 250));
+		rightPanel.add(button, BorderLayout.NORTH);
+		
+		button = createStarButton("<html>C<br>O<br>M<br>P<br>L<br>E<br>T<br>E</html>", completeBtnClicked());
+		button.setFont(verticalFont);
+		button.setPreferredSize(new Dimension(75, 250));
+		rightPanel.add(button, BorderLayout.SOUTH);
+		
+		tempPanel2.add(rightPanel, BorderLayout.EAST);
 		
 		tempPanel1.add(tempPanel2, BorderLayout.CENTER);
 		cp.add(tempPanel1, BorderLayout.CENTER);
@@ -152,7 +173,7 @@ public class MainForm extends Base {
 		Font font = new Font("나눔 고딕", Font.BOLD, 20);
 		Dimension dimension = new Dimension(75, 35);
 		
-		JButton button = createStarButton("◀", leftBtnClicked());
+		button = createStarButton("◀", leftBtnClicked());
 		button.setPreferredSize(dimension);
 		button.setFont(font);
 		panel.add(button);
@@ -175,24 +196,51 @@ public class MainForm extends Base {
 		cp.add(panel, BorderLayout.SOUTH);
 	}
 	
+	private ActionListener completeBtnClicked() {
+		return new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Config.playSound("btnClick.wav");
+				
+				if(maxBuildIdx == -1) {
+					JOptionPane.showMessageDialog(Config.frames.get(0), "빌드가 비어있습니다", "경고!", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+				
+				new AttackCheckForm().setVisible(true);
+				Config.frames.get(0).setVisible(false);
+			}
+		};
+	}
+
+	private ActionListener resetBtnClicked(JFrame frame) {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Config.playSound("btnClick.wav");
+				
+				int reply = JOptionPane.showConfirmDialog(frame, "초기화하시곘습니까? (되돌릴 수 없습니다)", "경고!", JOptionPane.YES_NO_OPTION);
+				if (reply == JOptionPane.YES_OPTION) {
+					Config.buildList.clear();
+					new MainForm().setVisible(true);
+
+					Config.frames.remove(frame);
+					frame.dispose();
+				}
+			}
+		};
+	}
+
 	private ActionListener leftBtnClicked() {
 		return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Config.playSound("btnClick.wav");
 				
-				if(list2Idx == 0) {
-					if(list1Idx != 0) {
-						buildList.get(list1Idx--).get(list2Idx).setBackground(Color.darkGray);
-
-						list2Idx = 19;
-						buildList.get(list1Idx).get(list2Idx).setBackground(Config.starBackColor);
-					}
-				}
-				
-				else {
-					buildList.get(list1Idx).get(list2Idx--).setBackground(Color.darkGray);
-					buildList.get(list1Idx).get(list2Idx).setBackground(Config.starBackColor);
+				if(buildIdx > 0) {
+					recentButton.setBackground(Color.darkGray);
+					recentButton = Config.buildList.get(--buildIdx);
+					recentButton.setBackground(Config.starBackColor);
 				}
 			}
 		};
@@ -203,6 +251,35 @@ public class MainForm extends Base {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Config.playSound("btnClick.wav");
+				
+				if(recentButton == null)
+					return;				
+				if(maxBuildIdx == -1)
+					return;
+				
+				boardPanel.remove(recentButton);
+				buildBtnIdx.remove(recentButton);
+				
+				if(--buildIdx == -1)
+					buildIdx = 0;
+				maxBuildIdx--;
+				
+				if(maxBuildIdx == -1) {
+					recentButton = null;
+					return;
+				}
+				
+				for(Entry<JButton, Integer> entry : buildBtnIdx.entrySet()) {
+					int value = entry.getValue();
+					
+					if(value > buildIdx)
+						buildBtnIdx.put(entry.getKey(), value - 1);
+				}
+				
+				recentButton = (JButton) boardPanel.getComponent(buildIdx);
+				recentButton.setBackground(Config.starBackColor);
+				
+				boardPanel.revalidate();
 			}
 		};
 	}
@@ -213,16 +290,62 @@ public class MainForm extends Base {
 			public void actionPerformed(ActionEvent e) {
 				Config.playSound("btnClick.wav");
 				
-				JButton button = createStarButton(selectedBtn.getText(), buildBtnClicked());
+				if(maxBuildIdx == 1999) {
+					JOptionPane.showMessageDialog(Config.frames.get(0), "최대 개수 한도에 도달하였습니다", "경고!", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+				
+				Font font = new Font("나눔 고딕", Font.BOLD, 20);
+				JButton button = createStarButton(selectedBtn.getText(), null);
+				button.addActionListener(buildBtnClicked(button, buildIdx + 1));
+				buildBtnIdx.put(button, buildIdx + 1);
+				button.setFont(font);
+			
+				if(buildIdx == maxBuildIdx++)
+					boardPanel.add(button);
+				
+				else {
+					List<Component> components = new ArrayList<>();
+					for(int i = maxBuildIdx - 1; i > buildIdx; i--) {
+						components.add(boardPanel.getComponent(i));
+						boardPanel.remove(i);
+					}
+					
+					boardPanel.add(button);
+					
+					for(Component component : components)
+						boardPanel.add(component);
+				}
+				
+				Config.buildList.add(++buildIdx, button);				
+				boardPanel.revalidate();
+				boardPanel.repaint();
+				
+				for(Entry<JButton, Integer> entry : buildBtnIdx.entrySet()) {
+					int value = entry.getValue();
+					
+					if(value > buildIdx)
+						buildBtnIdx.put(entry.getKey(), value + 1);
+				}
+				
+				if(recentButton != null)
+					recentButton.setBackground(Color.darkGray);
+				recentButton = button;
 			}
 		};
 	}
 	
-	private ActionListener buildBtnClicked() {
+	private ActionListener buildBtnClicked(JButton button, int idx) {
 		return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Config.playSound("btnClick.wav");
+				
+				recentButton.setBackground(Color.darkGray);
+				
+				buildIdx = buildBtnIdx.get(button);
+				recentButton = button;
+				recentButton.setBackground(Config.starBackColor);
 			}
 		};
 	}
@@ -233,18 +356,10 @@ public class MainForm extends Base {
 			public void actionPerformed(ActionEvent e) {
 				Config.playSound("btnClick.wav");
 				
-				if(list2Idx != 19 && buildList.get(list1Idx).size() > list2Idx) {
-					buildList.get(list1Idx).get(list2Idx++).setBackground(Color.darkGray);
-					buildList.get(list1Idx).get(list2Idx).setBackground(Config.starBackColor);
-				}
-				
-				else {
-					if(list1Idx + 1 != buildList.size()) {
-						buildList.get(list1Idx++).get(list2Idx).setBackground(Color.darkGray);
-						
-						list2Idx = 0;
-						buildList.get(list1Idx).get(list2Idx).setBackground(Config.starBackColor);
-					}
+				if(buildIdx < maxBuildIdx) {
+					recentButton.setBackground(Color.darkGray);
+					recentButton = Config.buildList.get(++buildIdx);
+					recentButton.setBackground(Config.starBackColor);
 				}
 			}
 		};

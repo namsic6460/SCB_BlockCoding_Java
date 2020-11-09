@@ -24,7 +24,7 @@ import scb.base.Config.TRIBE;
 public class StartForm extends Base {
 	
 	public StartForm() {
-		super("스타크래프트 봇 프로그래밍", 960, 620, 0, 0);
+		super("스타크래프트 봇 프로그래밍", 960, 640, 0, 0);
 		JFrame frame = this;
 		
 		ImageIcon icon = new ImageIcon(Config.IMAGE_PATH + "SCB_slow.gif");
@@ -42,7 +42,6 @@ public class StartForm extends Base {
 				try {
 					Thread.sleep(2500); 
 				} catch (InterruptedException e) {
-					System.out.println("error!");
 					throw new RuntimeException(e);
 				}
 				
@@ -99,16 +98,14 @@ public class StartForm extends Base {
 				
 				try {
 					if(Main.initThread.isAlive()) {
-						showDialog(null, "로딩중입니다\n잠시만 기다려주세요!", JOptionPane.WARNING_MESSAGE);
-						Main.initThread.wait();
+						JOptionPane.showMessageDialog(null, "로딩중입니다\n잠시만 기다려주세요!", "경고!", JOptionPane.WARNING_MESSAGE);
+						Main.initThread.join();
 					}
 				} catch (InterruptedException e_) {
-					e_.printStackTrace();
+					throw new RuntimeException(e_);
 				}
 				
 				new MainForm().setVisible(true);
-				
-				Config.frames.remove(frame);
 				frame.dispose();
 			}
 		};

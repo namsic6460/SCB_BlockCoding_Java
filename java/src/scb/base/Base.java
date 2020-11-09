@@ -1,14 +1,12 @@
 package scb.base;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 @SuppressWarnings("serial")
 public class Base extends JFrame {
@@ -21,7 +19,7 @@ public class Base extends JFrame {
 		setSize(width, height);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(3);
-		setResizable(false);
+//		setResizable(false);
 		setLayout(new BorderLayout(wgap, hgap));
 	}
 	
@@ -50,10 +48,6 @@ public class Base extends JFrame {
 		button.setBorder(Config.starLineBorder);
 		
 		return button;
-	}
-	
-	public void showDialog(Component component, String message, int type) {
-		JOptionPane.showMessageDialog(component, message, "메시지", type);
 	}
 	
 }

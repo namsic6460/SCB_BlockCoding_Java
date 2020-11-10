@@ -202,7 +202,7 @@ public class StrategyManager {
 		}
 		
 		else
-			throw new RuntimeException("선택한 종족과 실행된 종족이 다릅니다!");
+			System.err.println("Selected race is different to the coding race");
 	}
 	
 	public void executeCombat() {

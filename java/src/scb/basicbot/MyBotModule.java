@@ -1,7 +1,5 @@
 package scb.basicbot;
 
-import javax.swing.JFrame;
-
 import bwapi.DefaultBWListener;
 import bwapi.Game;
 import bwapi.Mirror;
@@ -11,8 +9,6 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.Flag.Enum;
 import bwta.BWTA;
-import scb.base.Config;
-import scb.form.AttackCheckForm;
 import scb.form.GameForm;
 
 // BasicBot 1.1 Patch Start ////////////////////////////////////////////////
@@ -66,6 +62,8 @@ public class MyBotModule extends DefaultBWListener {
 	/// 경기가 시작될 때 일회적으로 발생하는 이벤트를 처리합니다
 	@Override
 	public void onStart() {
+		GameForm.timerTask.cancel();
+		System.out.println("Connection successful, starting match...");
 		Broodwar = mirror.getGame();
 
 		gameCommander = new GameCommander();
@@ -117,9 +115,14 @@ public class MyBotModule extends DefaultBWListener {
 		gameCommander.onEnd(isWinner);
 
 		System.out.println("Match ended");
+		System.out.println("Program will closed in 3 seconds");
 		
-		Config.frames.remove(2);
-		
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.exit(0);
 		
 		return;
 	}

@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -44,6 +45,9 @@ public class AttackCheckForm extends Base {
 		JPanel c_cp = new JPanel(new BorderLayout());
 		JPanel c_cp2 = new JPanel(new GridLayout(5, 1, 0, 15));
 		c_cp.setBorder(new EmptyBorder(5, 5, 5, 5));
+		
+		Config.numLabels = new ArrayList<>();
+		Config.comboBoxes = new ArrayList<>();
 		
 		JPanel innerPanel = null;
 		for(int i = 0; i < 5; i++) {

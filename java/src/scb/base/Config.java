@@ -36,8 +36,8 @@ public class Config {
 	public static ImageIcon zerglingImageIcon = new ImageIcon(Config.IMAGE_PATH + "zergling.jpg");
 	public static ImageIcon mainImageIcon = new ImageIcon(Config.IMAGE_PATH + "SCB_edit.png");
 	
-	public static ArrayList<JLabel> numLabels = new ArrayList<>();
-	public static ArrayList<JComboBox<String>> comboBoxes = new ArrayList<>();
+	public static ArrayList<JLabel> numLabels;
+	public static ArrayList<JComboBox<String>> comboBoxes;
 	
 	public static AudioStream audioStream = null;
 

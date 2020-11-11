@@ -54,11 +54,11 @@ public class AttackCheckForm extends Base {
 			innerPanel = new JPanel(new FlowLayout());
 			innerPanel.setBorder(new LineBorder(Color.black));
 			
-			JComboBox<String> comboBox = new JComboBox<>(
-					Config.unitList.get(Config.tribe).get(UNIT_TYPE.UNIT).toArray(new String[0]));
+			ArrayList<String> list = Config.unitList.get(Config.tribe).get(UNIT_TYPE.UNIT);
+			list.add(0, "");
+			JComboBox<String> comboBox = new JComboBox<>(list.toArray(new String[0]));
 			comboBox.setPreferredSize(new Dimension(270, 60));
 			comboBox.setFont(font);
-			comboBox.setSelectedIndex(-1);
 			comboBox.setBorder(new EmptyBorder(4, 0, 0, 0));
 			comboBox.addActionListener(new ActionListener() {				
 				@Override
@@ -124,7 +124,7 @@ public class AttackCheckForm extends Base {
 				for(int i = 0; i < 5; i++) {
 					num = Integer.parseInt(Config.numLabels.get(i).getText());
 					
-					if(Config.comboBoxes.get(i).getSelectedIndex() != -1) {
+					if(Config.comboBoxes.get(i).getSelectedIndex() != 0) {
 						if(num == 0) {
 							flag = false;
 							break;

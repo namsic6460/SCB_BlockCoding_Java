@@ -89,7 +89,7 @@ public class GameForm extends Base {
 				
 				else {
 					AudioPlayer.player.start(Config.audioStream);
-					isPlaying = true;
+					isPlaying = true;	
 				}
 			}
 		};

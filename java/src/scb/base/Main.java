@@ -1,7 +1,6 @@
 package scb.base;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -51,8 +50,6 @@ public class Main {
 			JOptionPane.showMessageDialog(null, "프로그램 설정을 완료했습니다!\n프로그램을 껐다 켜주세요");
 			System.exit(0);
 		}
-		
-		System.load(Config.SYSTEM_PATH + "bwapi_bridge2_5.dll");
 		
 		for(TRIBE tribe : TRIBE.values())
 			Config.unitList.put(tribe, new LinkedHashMap<>());

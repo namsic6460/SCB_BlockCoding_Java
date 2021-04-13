@@ -136,17 +136,18 @@ public class MyBotModule extends DefaultBWListener {
 		try {
 			gameCommander.onFrame();
 		} catch (Exception e) {
-			Broodwar.sendText("[Error Stack Trace]");
-			System.out.println("[Error Stack Trace]");
-			for (StackTraceElement ste : e.getStackTrace()) {
-				Broodwar.sendText(ste.toString());
-				System.out.println(ste.toString());
-			}
-			Broodwar.sendText("GG");
-
-			isExceptionLostConditionSatisfied = true;
-
-			exceptionLostConditionSatisfiedFrame = Broodwar.getFrameCount();
+			e.printStackTrace();
+//			Broodwar.sendText("[Error Stack Trace]");
+//			System.out.println("[Error Stack Trace]");
+//			for (StackTraceElement ste : e.getStackTrace()) {
+//				Broodwar.sendText(ste.toString());
+//				System.out.println(ste.toString());
+//			}
+//			Broodwar.sendText("GG");
+//
+//			isExceptionLostConditionSatisfied = true;
+//
+//			exceptionLostConditionSatisfiedFrame = Broodwar.getFrameCount();
 		}
 
 		if (isExceptionLostConditionSatisfied) {

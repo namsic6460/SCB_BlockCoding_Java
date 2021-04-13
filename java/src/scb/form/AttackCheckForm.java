@@ -54,7 +54,8 @@ public class AttackCheckForm extends Base {
 			innerPanel = new JPanel(new FlowLayout());
 			innerPanel.setBorder(new LineBorder(Color.black));
 			
-			ArrayList<String> list = Config.unitList.get(Config.tribe).get(UNIT_TYPE.UNIT);
+			@SuppressWarnings("unchecked")
+			ArrayList<String> list = (ArrayList<String>) Config.unitList.get(Config.tribe).get(UNIT_TYPE.UNIT).clone();
 			list.add(0, "");
 			JComboBox<String> comboBox = new JComboBox<>(list.toArray(new String[0]));
 			comboBox.setPreferredSize(new Dimension(270, 60));

@@ -273,12 +273,16 @@ public class StrategyManager {
 	}
 	
 	private void checkAttack() {
+		if(MyBotModule.Broodwar.getFrameCount() < 1)
+			return;
+		
 		for(Entry<UnitType, Integer> entry : Config.attackTiming.entrySet()) {
 			UnitType key = entry.getKey();
 			int count = entry.getValue();			
 			int unitCount = InformationManager.Instance().getNumUnits(key, InformationManager.Instance().selfPlayer); 
 			
 			if(unitCount >= count) {
+				System.out.println("Started attack!");
 				isFullScaleAttackStarted = true;
 				return;
 			}

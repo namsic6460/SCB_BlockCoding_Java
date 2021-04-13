@@ -216,6 +216,8 @@ public class InformationManager {
 
 	/// 해당 Player (아군 or 적군) 의 해당 UnitType 유닛 숫자를 리턴합니다 (훈련/건설 중인 유닛 숫자까지 포함)
 	public int getNumUnits(UnitType t, Player player) {
+		if(t == null)
+			return 0;
 		return getUnitData(player).getNumUnits(t.toString());
 	}
 

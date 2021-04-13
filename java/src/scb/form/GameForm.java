@@ -61,8 +61,8 @@ public class GameForm extends Base {
 		add(cp, BorderLayout.CENTER);
 		
 		//STDOUT, STDERR		
-		System.setOut(new PrintStream(new StreamCapturer(capturePane, "black")));
-		System.setErr(new PrintStream(new StreamCapturer(capturePane, "red")));
+		System.setOut(new PrintStream(new StreamCapturer(capturePane, "black", System.out)));
+		System.setErr(new PrintStream(new StreamCapturer(capturePane, "red", System.err)));
 		
 		System.out.println("Connecting to Broodwar...");
 		
@@ -164,11 +164,13 @@ public class GameForm extends Base {
 	    private StringBuilder buffer;
 	    private Consumer consumer;
 	    private String spanStyle;
+	    private PrintStream old;
 
-	    public StreamCapturer(Consumer consumer, String spanStyle) {
+	    public StreamCapturer(Consumer consumer, String spanStyle, PrintStream old) {
 	        this.spanStyle = spanStyle;
 	        buffer = new StringBuilder(128);
 	        this.consumer = consumer;
+	        this.old = old;
 	    }
 
 	    @Override
@@ -182,6 +184,7 @@ public class GameForm extends Base {
 	            consumer.appendText(buffer.toString());
 	            buffer.delete(0, buffer.length());
 	        }
+	        old.print(c);
 	    }
 	    
 	}
